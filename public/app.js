@@ -22,49 +22,50 @@ const RSS_SOURCES = [
     { name: "Experimental History", url: "https://www.experimental-history.com/feed" },
 ];
 
-// 默认关键词
-const DEFAULT_KEYWORDS = ['AI', 'agent', 'LLM', 'GPT', 'Claude'];
-
-// API 配置
+// API 配置模板
 const API_CONFIGS = {
     minimax: {
         name: 'MiniMax',
-        modelPlaceholder: 'MiniMax-M2.5',
-        baseUrlPlaceholder: 'https://api.minimax.chat'
+        model: 'MiniMax-M2.5',
+        baseUrl: 'https://api.minimax.chat'
     },
     openai: {
         name: 'OpenAI',
-        modelPlaceholder: 'gpt-4o-mini',
-        baseUrlPlaceholder: 'https://api.openai.com/v1'
+        model: 'gpt-4o-mini',
+        baseUrl: 'https://api.openai.com/v1'
+    },
+    anthropic: {
+        name: 'Anthropic',
+        model: 'claude-sonnet-4-20250514',
+        baseUrl: 'https://api.anthropic.com/v1'
     },
     volcengine: {
         name: '火山引擎',
-        modelPlaceholder: 'deepseek-v3-2-251201',
-        baseUrlPlaceholder: 'https://ark.cn-beijing.volces.com/api/v3'
+        model: 'deepseek-v3-2-251201',
+        baseUrl: 'https://ark.cn-beijing.volces.com/api/v3'
+    },
+    custom: {
+        name: '自定义',
+        model: '',
+        baseUrl: 'https://api.openai.com/v1'
     }
-};
-
-// 当前任务信息
-let currentTask = {
-    total: 0,
-    current: 0,
-    currentTitle: ''
 };
 
 // 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', () => {
     loadSettings();
     setupKeywordTags();
-    toggleApiFields();
+    setupApiProvider();
 });
 
-// 切换 API 提供商时更新表单
-function toggleApiFields() {
-    const provider = document.getElementById('apiProvider').value;
-    const config = API_CONFIGS[provider];
-
-    document.getElementById('apiModel').placeholder = config.modelPlaceholder;
-    document.getElementById('apiBaseUrl').placeholder = config.baseUrlPlaceholder;
+// 切换 API 提供商时更新
+function setupApiProvider() {
+    const provider = document.getElementById('apiProvider');
+    provider.addEventListener('change', () => {
+        const config = API_CONFIGS[provider.value];
+        document.getElementById('apiModel').placeholder = config.model;
+        document.getElementById('apiModel').value = '';
+    });
 }
 
 // 关键词标签点击事件
@@ -93,15 +94,16 @@ function getSelectedKeywords() {
 // 获取用户配置
 function getSettings() {
     const provider = document.getElementById('apiProvider').value;
+    const config = API_CONFIGS[provider];
 
     return {
         apiProvider: provider,
         apiKey: document.getElementById('apiKey').value.trim(),
-        apiModel: document.getElementById('apiModel').value.trim() || API_CONFIGS[provider].modelPlaceholder,
-        apiBaseUrl: document.getElementById('apiBaseUrl').value.trim() || API_CONFIGS[provider].baseUrlPlaceholder,
+        apiModel: document.getElementById('apiModel').value.trim() || config.model,
+        apiBaseUrl: config.baseUrl,
         keywords: getSelectedKeywords(),
-        daysBack: parseInt(document.getElementById('daysBack').value) || 7,
-        maxArticles: parseInt(document.getElementById('maxArticles').value) || 10
+        daysBack: parseInt(document.getElementById('daysBack').value) || 3,
+        maxArticles: Math.min(parseInt(document.getElementById('maxArticles').value) || 10, 10)
     };
 }
 
@@ -123,9 +125,8 @@ function loadSettings() {
         document.getElementById('apiProvider').value = settings.apiProvider || 'minimax';
         document.getElementById('apiKey').value = settings.apiKey || '';
         document.getElementById('apiModel').value = settings.apiModel || '';
-        document.getElementById('apiBaseUrl').value = settings.apiBaseUrl || '';
         document.getElementById('customKeywords').value = settings.customKeywords || '';
-        document.getElementById('daysBack').value = settings.daysBack || 7;
+        document.getElementById('daysBack').value = settings.daysBack || 3;
         document.getElementById('maxArticles').value = settings.maxArticles || 10;
 
         // 恢复关键词选中状态
@@ -140,25 +141,52 @@ function loadSettings() {
     }
 }
 
-// 更新进度条
-function updateProgress(percent, current, total, currentTitle) {
-    document.getElementById('progressBar').style.width = percent + '%';
-    document.getElementById('progressText').textContent = `${current} / ${total}`;
+// 模拟进度条动画
+let progressInterval = null;
 
-    if (currentTitle) {
-        document.getElementById('currentItem').textContent = currentTitle;
-    }
+function startProgressAnimation() {
+    let progress = 0;
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    const currentItem = document.getElementById('currentItem');
+
+    const messages = [
+        '正在连接服务器...',
+        '正在抓取 RSS 源...',
+        '正在过滤匹配的文章...',
+        '正在调用 AI 生成摘要...',
+        'AI 正在思考中...',
+        '快完成了...'
+    ];
+    let msgIndex = 0;
+
+    progressBar.style.width = '0%';
+
+    progressInterval = setInterval(() => {
+        // 随机递增进度
+        progress += Math.random() * 8;
+        if (progress > 90) progress = 90;
+
+        progressBar.style.width = progress + '%';
+        progressText.textContent = Math.round(progress) + '%';
+
+        // 随机更新当前操作提示
+        if (Math.random() > 0.7) {
+            currentItem.textContent = messages[msgIndex % messages.length];
+            msgIndex++;
+        }
+    }, 800);
 }
 
-// 更新加载状态
-function setLoadingState(title, desc, current, total, currentTitle) {
-    document.getElementById('loadingTitle').textContent = title;
-    document.getElementById('loadingText').textContent = desc;
-
-    if (total > 0) {
-        const percent = Math.round((current / total) * 100);
-        updateProgress(percent, current, total, currentTitle);
+function stopProgressAnimation() {
+    if (progressInterval) {
+        clearInterval(progressInterval);
+        progressInterval = null;
     }
+    // 完成进度
+    document.getElementById('progressBar').style.width = '100%';
+    document.getElementById('progressText').textContent = '100%';
+    document.getElementById('currentItem').textContent = '✅ 处理完成！';
 }
 
 // 生成阅读简报
@@ -183,26 +211,19 @@ async function generateReport() {
     document.getElementById('results').style.display = 'none';
     document.getElementById('loading').style.display = 'block';
 
-    // 初始化进度
-    currentTask = { total: 0, current: 0, currentTitle: '' };
-    setLoadingState('🚀 正在启动...', '准备连接服务器', 0, 0, '');
+    // 初始化状态
+    document.getElementById('loadingTitle').textContent = '🚀 正在启动...';
+    document.getElementById('loadingText').textContent = '准备连接服务器';
+    document.getElementById('currentItem').textContent = '';
+
+    // 启动进度动画
+    startProgressAnimation();
 
     try {
-        // 第一阶段：获取文章
-        setLoadingState('📥 正在抓取资讯', '正在从 RSS 源获取文章...', 0, 0, '连接服务器...');
-
         const response = await fetch('/api/generate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                keywords: settings.keywords,
-                daysBack: settings.daysBack,
-                maxArticles: settings.maxArticles,
-                apiProvider: settings.apiProvider,
-                apiKey: settings.apiKey,
-                apiModel: settings.apiModel,
-                apiBaseUrl: settings.apiBaseUrl
-            })
+            body: JSON.stringify(settings)
         });
 
         if (!response.ok) {
@@ -215,14 +236,14 @@ async function generateReport() {
             throw new Error(result.error);
         }
 
-        // 第二阶段：AI 处理
-        const articles = result.articles || [];
-        setLoadingState('🤖 AI 正在生成摘要', `共 ${articles.length} 篇文章需要处理...`, 0, articles.length, '');
+        // 停止进度动画
+        stopProgressAnimation();
 
         // 显示结果
-        displayResults(articles);
+        displayResults(result.articles || []);
 
     } catch (error) {
+        stopProgressAnimation();
         alert('生成失败: ' + error.message);
         goHome();
     }
@@ -255,6 +276,11 @@ function displayResults(articles) {
     const container = document.getElementById('articles');
     container.innerHTML = '';
 
+    if (articles.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #666; padding: 40px;">没有找到匹配的文章，可以尝试调整关键词或增加抓取天数</p>';
+        return;
+    }
+
     articles.forEach((article, index) => {
         const div = document.createElement('div');
         div.className = 'article';
@@ -264,7 +290,7 @@ function displayResults(articles) {
                 <span class="source">${escapeHtml(article.source)}</span>
                 <a href="${escapeHtml(article.url)}" target="_blank">查看原文 →</a>
             </div>
-            <div class="article-summary markdown-body">
+            <div class="article-summary">
                 ${renderMarkdown(article.summary)}
             </div>
         `;
@@ -281,13 +307,14 @@ function escapeHtml(text) {
 
 // 返回首页
 function goHome() {
+    stopProgressAnimation();
     document.getElementById('settingsPanel').style.display = 'block';
     document.getElementById('results').style.display = 'none';
     document.getElementById('loading').style.display = 'none';
 
     // 重置进度条
     document.getElementById('progressBar').style.width = '0%';
-    document.getElementById('progressText').textContent = '0 / 0';
+    document.getElementById('progressText').textContent = '0%';
     document.getElementById('currentItem').textContent = '';
 }
 

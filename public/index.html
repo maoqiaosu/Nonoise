@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nonoise - 个性化阅读简报</title>
     <link rel="stylesheet" href="/style.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.2.0/github-markdown.min.css">
 </head>
 <body>
     <div class="container">
@@ -24,15 +23,21 @@
 
             <!-- API 配置 -->
             <div class="form-group">
-                <label>API Key <span class="required">*</span></label>
-                <select id="apiProvider" onchange="toggleApiFields()">
-                    <option value="minimax">MiniMax</option>
-                    <option value="openai">OpenAI</option>
-                    <option value="volcengine">火山引擎</option>
-                </select>
-                <input type="password" id="apiKey" placeholder="请输入你的 API Key" />
-                <input type="text" id="apiModel" placeholder="模型名称，如 MiniMax-M2.5" />
-                <input type="text" id="apiBaseUrl" placeholder="API 地址（可选）" class="optional" />
+                <label>API 配置 <span class="required">*</span></label>
+                <div class="api-config">
+                    <select id="apiProvider">
+                        <option value="minimax">MiniMax</option>
+                        <option value="openai">OpenAI</option>
+                        <option value="anthropic">Anthropic (Claude)</option>
+                        <option value="volcengine">火山引擎</option>
+                        <option value="custom">自定义兼容 OpenAI 协议</option>
+                    </select>
+                    <input type="text" id="apiModel" placeholder="模型名称，如 MiniMax-M2.5、gpt-4o、claude-sonnet-4-20250514" />
+                    <input type="password" id="apiKey" placeholder="API Key" />
+                </div>
+                <p class="form-hint">
+                    支持 MiniMax、OpenAI、Anthropic、火山引擎等兼容 OpenAI 协议的大模型 API
+                </p>
             </div>
 
             <!-- 关键词选择 -->
@@ -40,8 +45,8 @@
                 <label>选择你感兴趣的关键词</label>
                 <div class="keyword-tags" id="keywordTags">
                     <span class="tag" data-value="AI">AI</span>
-                    <span class="tag" data-value="agent">Agent</span>
-                    <span class="tag" data-value="LLM">LLM</span>
+                    <span class="tag selected" data-value="agent">Agent</span>
+                    <span class="tag selected" data-value="LLM">LLM</span>
                     <span class="tag" data-value="GPT">GPT</span>
                     <span class="tag" data-value="Claude">Claude</span>
                     <span class="tag" data-value="machine learning">Machine Learning</span>
@@ -55,7 +60,7 @@
                     <span class="tag" data-value="code">Code</span>
                     <span class="tag" data-value="engineering">Engineering</span>
                 </div>
-                <input type="text" id="customKeywords" placeholder="自定义关键词，用逗号分隔" class="optional" />
+                <input type="text" id="customKeywords" placeholder="自定义关键词，用英文逗号分隔，如: python,rust,web3" class="optional" />
             </div>
 
             <!-- 其他设置 -->
@@ -63,13 +68,13 @@
                 <label>其他设置</label>
                 <div class="settings-row">
                     <span>抓取最近</span>
-                    <input type="number" id="daysBack" value="7" min="1" max="30" />
+                    <input type="number" id="daysBack" value="3" min="1" max="30" />
                     <span>天</span>
                 </div>
                 <div class="settings-row">
-                    <span>输出文章数</span>
-                    <input type="number" id="maxArticles" value="10" min="5" max="50" />
-                    <span>篇</span>
+                    <span>最多输出</span>
+                    <input type="number" id="maxArticles" value="10" min="5" max="10" />
+                    <span>篇文章</span>
                 </div>
             </div>
 
@@ -93,7 +98,7 @@
                     <div class="progress-bar">
                         <div class="progress" id="progressBar"></div>
                     </div>
-                    <span class="progress-text" id="progressText">0 / 0</span>
+                    <span class="progress-text" id="progressText">0%</span>
                 </div>
                 <div class="current-item" id="currentItem"></div>
             </div>

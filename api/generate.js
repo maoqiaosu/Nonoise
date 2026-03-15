@@ -188,7 +188,7 @@ async function generateSummary(article, config) {
             messages: [{ role: 'user', content: prompt }],
             max_tokens: 600
         };
-    } else if (config.apiProvider === 'volcengine') {
+    } else if (config.apiProvider === 'volcengine' || config.apiProvider === 'custom') {
         url = `${baseUrl}/chat/completions`;
         headers = {
             'Authorization': `Bearer ${config.apiKey}`,
@@ -198,6 +198,19 @@ async function generateSummary(article, config) {
             model: config.apiModel,
             messages: [{ role: 'user', content: prompt }],
             max_tokens: 600
+        };
+    } else if (config.apiProvider === 'anthropic') {
+        // Anthropic API
+        url = `${baseUrl}/messages`;
+        headers = {
+            'x-api-key': config.apiKey,
+            'anthropic-version': '2023-06-01',
+            'Content-Type': 'application/json'
+        };
+        data = {
+            model: config.apiModel,
+            max_tokens: 600,
+            messages: [{ role: 'user', content: prompt }]
         };
     }
 
@@ -215,15 +228,25 @@ async function generateSummary(article, config) {
 
         const result = await response.json();
 
+        // OpenAI / MiniMax / 火山引擎格式
         if (result.choices && result.choices[0]) {
             return result.choices[0].message.content;
-        } else if (result.base_resp) {
-            return `API 错误: ${result.base_resp.status_msg}`;
-        } else if (result.error) {
-            return `API 错误: ${result.error.message || JSON.stringify(result)}`;
-        } else {
-            return `API 返回异常: ${JSON.stringify(result).substring(0, 100)}`;
         }
+        // Anthropic 格式
+        if (result.content && result.content[0]) {
+            return result.content[0].text;
+        }
+        // 错误处理
+        if (result.base_resp) {
+            return `API 错误: ${result.base_resp.status_msg}`;
+        }
+        if (result.error) {
+            return `API 错误: ${result.error.message || JSON.stringify(result)}`;
+        }
+        if (result.type === 'error') {
+            return `API 错误: ${result.error?.message || JSON.stringify(result)}`;
+        }
+        return `API 返回异常: ${JSON.stringify(result).substring(0, 100)}`;
     } catch (error) {
         return `调用失败: ${error.message}`;
     }

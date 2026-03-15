@@ -119,13 +119,23 @@ body {
 
 .form-group select {
     cursor: pointer;
+    margin-bottom: 10px;
+}
+
+/* API 配置 */
+.api-config {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.form-hint {
+    font-size: 0.8rem;
+    color: var(--text-light);
+    margin-top: 8px;
 }
 
 /* 关键词标签 */
-.form-group:nth-child(2) {
-    margin-bottom: 20px;
-}
-
 .keyword-tags {
     display: flex;
     flex-wrap: wrap;
@@ -303,7 +313,7 @@ body {
 .progress-text {
     font-size: 0.875rem;
     color: var(--text-light);
-    min-width: 50px;
+    min-width: 40px;
 }
 
 .current-item {

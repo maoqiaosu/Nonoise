@@ -36,6 +36,16 @@ body {
     padding: 40px 20px;
 }
 
+.logo-link {
+    display: inline-block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.logo-link:hover {
+    opacity: 0.8;
+}
+
 .logo {
     font-size: 3rem;
     margin-bottom: 10px;
@@ -327,6 +337,17 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.btn-cancel {
+    margin-top: 20px;
+    background: #fee2e2;
+    color: #dc2626;
+    padding: 10px 24px;
+}
+
+.btn-cancel:hover {
+    background: #fecaca;
 }
 
 /* 结果展示 */

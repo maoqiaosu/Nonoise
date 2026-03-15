@@ -10,8 +10,10 @@
     <div class="container">
         <!-- Header -->
         <header class="header">
-            <div class="logo">🔇</div>
-            <h1>Nonoise</h1>
+            <a href="/" class="logo-link">
+                <div class="logo">🔇</div>
+                <h1>Nonoise</h1>
+            </a>
             <p class="subtitle">源自 Andrej Karpathy 推荐的 100+ 优质技术博客，一键生成中文阅读简报</p>
         </header>
 
@@ -29,7 +31,7 @@
                     <input type="password" id="apiKey" placeholder="API Key" />
                 </div>
                 <p class="form-hint">
-                    支持 MiniMax、OpenAI、Anthropic、火山引擎等兼容 OpenAI 协议的大模型
+                    支持 MiniMax、OpenAI、Anthropic，火山引擎等兼容 OpenAI 协议的大模型
                 </p>
             </div>
 
@@ -94,6 +96,7 @@
                     <span class="progress-text" id="progressText">0%</span>
                 </div>
                 <div class="current-item" id="currentItem"></div>
+                <button class="btn btn-cancel" onclick="cancelAndGoHome()">✕ 取消</button>
             </div>
         </div>
 

@@ -97,6 +97,8 @@ function loadSettings() {
 
 // 模拟进度条动画
 let progressInterval = null;
+let abortController = null;
+let isCancelled = false;
 
 function startProgressAnimation() {
     let progress = 0;
@@ -162,6 +164,10 @@ async function generateReport() {
         return;
     }
 
+    // 初始化取消状态
+    isCancelled = false;
+    abortController = new AbortController();
+
     // 保存设置
     saveSettings();
 
@@ -182,14 +188,21 @@ async function generateReport() {
         const response = await fetch('/api/generate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(settings)
+            body: JSON.stringify(settings),
+            signal: abortController.signal
         });
+
+        // 检查是否被取消
+        if (isCancelled) return;
 
         if (!response.ok) {
             throw new Error('请求失败');
         }
 
         const result = await response.json();
+
+        // 检查是否被取消
+        if (isCancelled) return;
 
         if (result.error) {
             throw new Error(result.error);
@@ -202,6 +215,10 @@ async function generateReport() {
         displayResults(result.articles || []);
 
     } catch (error) {
+        // 如果是取消操作，不显示错误
+        if (error.name === 'AbortError' || isCancelled) {
+            return;
+        }
         stopProgressAnimation();
         alert('生成失败: ' + error.message);
         goHome();
@@ -275,6 +292,26 @@ function goHome() {
     document.getElementById('progressBar').style.width = '0%';
     document.getElementById('progressText').textContent = '0%';
     document.getElementById('currentItem').textContent = '';
+}
+
+// 取消并返回首页
+function cancelAndGoHome() {
+    isCancelled = true;
+
+    // 终止请求
+    if (abortController) {
+        abortController.abort();
+    }
+
+    stopProgressAnimation();
+    document.getElementById('loadingTitle').textContent = '已取消';
+    document.getElementById('loadingText').textContent = '正在返回...';
+    document.getElementById('currentItem').textContent = '';
+
+    // 延迟一下返回，让用户看到取消状态
+    setTimeout(() => {
+        goHome();
+    }, 500);
 }
 
 // 复制到剪贴板

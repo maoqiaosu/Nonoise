@@ -1,5 +1,8 @@
 {
     "name": "nonoise",
     "version": "1.0.0",
-    "description": "Nonoise - 个性化 AI 资讯简报生成器"
+    "description": "Nonoise - 个性化 AI 资讯简报生成器",
+    "scripts": {
+        "build": "echo 'Build complete'"
+    }
 }

@@ -1,0 +1,13 @@
+{
+    "name": "ai-news-assistant",
+    "version": "1.0.0",
+    "description": "AI 资讯助手 - 个性化阅读简报生成器",
+    "scripts": {
+        "dev": "vercel dev",
+        "build": "vercel build",
+        "deploy": "vercel deploy"
+    },
+    "devDependencies": {
+        "vercel": "^32.0.0"
+    }
+}

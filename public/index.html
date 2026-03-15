@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 资讯助手 - 个性化阅读简报</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>🤖 AI 资讯助手</h1>
+            <p class="subtitle">从 100+ 优质技术博客生成个性化中文阅读简报</p>
+        </header>
+
+        <!-- 设置面板 -->
+        <section class="settings-panel" id="settingsPanel">
+            <h2>⚙️ 个性化设置</h2>
+
+            <!-- API 配置 -->
+            <div class="form-group">
+                <label>API Key <span class="required">*</span></label>
+                <select id="apiProvider" onchange="toggleApiFields()">
+                    <option value="minimax">MiniMax</option>
+                    <option value="openai">OpenAI</option>
+                    <option value="volcengine">火山引擎</option>
+                </select>
+                <input type="password" id="apiKey" placeholder="请输入你的 API Key" />
+                <input type="text" id="apiModel" placeholder="模型名称，如 MiniMax-M2.5" />
+                <input type="text" id="apiBaseUrl" placeholder="API 地址（可选）" class="optional" />
+            </div>
+
+            <!-- 关键词选择 -->
+            <div class="form-group">
+                <label>选择你感兴趣的关键词</label>
+                <div class="keyword-tags" id="keywordTags">
+                    <span class="tag" data-value="AI">AI</span>
+                    <span class="tag" data-value="agent">Agent</span>
+                    <span class="tag" data-value="LLM">LLM</span>
+                    <span class="tag" data-value="GPT">GPT</span>
+                    <span class="tag" data-value="Claude">Claude</span>
+                    <span class="tag" data-value="machine learning">Machine Learning</span>
+                    <span class="tag" data-value="startup">Startup</span>
+                    <span class="tag" data-value="entrepreneur">Entrepreneur</span>
+                    <span class="tag" data-value="SaaS">SaaS</span>
+                    <span class="tag" data-value="product">Product</span>
+                    <span class="tag" data-value="programming">Programming</span>
+                    <span class="tag" data-value="software">Software</span>
+                    <span class="tag" data-value="developer">Developer</span>
+                    <span class="tag" data-value="code">Code</span>
+                    <span class="tag" data-value="engineering">Engineering</span>
+                </div>
+                <input type="text" id="customKeywords" placeholder="自定义关键词，用逗号分隔" class="optional" />
+            </div>
+
+            <!-- 其他设置 -->
+            <div class="form-group">
+                <label>其他设置</label>
+                <div class="settings-row">
+                    <span>抓取最近</span>
+                    <input type="number" id="daysBack" value="7" min="1" max="30" />
+                    <span>天</span>
+                </div>
+                <div class="settings-row">
+                    <span>输出文章数</span>
+                    <input type="number" id="maxArticles" value="10" min="5" max="50" />
+                    <span>篇</span>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="generateReport()">
+                    🚀 一键生成阅读简报
+                </button>
+                <button class="btn btn-secondary" onclick="saveSettings()">
+                    💾 保存设置
+                </button>
+            </div>
+        </section>
+
+        <!-- 加载状态 -->
+        <div class="loading" id="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p id="loadingText">正在抓取资讯...</p>
+            <div class="progress-bar">
+                <div class="progress" id="progressBar"></div>
+            </div>
+        </div>
+
+        <!-- 结果展示 -->
+        <section class="results" id="results" style="display: none;">
+            <div class="results-header">
+                <h2>📰 今日阅读简报</h2>
+                <button class="btn btn-small" onclick="copyToClipboard()">📋 复制全部</button>
+            </div>
+            <div class="results-meta">
+                <span id="resultCount">0</span> 篇文章 · <span id="resultDate"></span>
+            </div>
+            <div class="articles" id="articles"></div>
+        </section>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <p>© 2026 AI 资讯助手 | 数据全部在本地处理，保护你的隐私</p>
+    </footer>
+
+    <script src="/app.js"></script>
+</body>
+</html>

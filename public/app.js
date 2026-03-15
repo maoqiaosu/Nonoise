@@ -1,72 +1,25 @@
 // RSS 源列表
 const RSS_SOURCES = [
     { name: "Simon Willison", url: "https://simonwillison.net/atom/everything/" },
-    { name: "Jeff Geerling", url: "https://www.jeffgeerling.com/blog.xml" },
-    { name: "Sean Goedecke", url: "https://www.seangoedecke.com/rss.xml" },
-    { name: "Krebs on Security", url: "https://krebsonsecurity.com/feed/" },
     { name: "Daring Fireball", url: "https://daringfireball.net/feeds/main" },
-    { name: "Eric Migicovsky", url: "https://ericmigi.com/rss.xml" },
-    { name: "Antirez", url: "http://antirez.com/rss" },
-    { name: "Idiallo", url: "https://idiallo.com/feed.rss" },
-    { name: "Maurycy", url: "https://maurycyz.com/index.xml" },
-    { name: "Pluralistic", url: "https://pluralistic.net/feed/" },
-    { name: "Shkspr.mobi", url: "https://shkspr.mobi/blog/feed/" },
-    { name: "Lcamtuf Substack", url: "https://lcamtuf.substack.com/feed" },
-    { name: "Mitchellh", url: "https://mitchellh.com/feed.xml" },
-    { name: "Dynomight", url: "https://dynomight.net/feed.xml" },
-    { name: "Xeiaso", url: "https://xeiaso.net/blog.rss" },
-    { name: "Microsoft OldNewThing", url: "https://devblogs.microsoft.com/oldnewthing/feed" },
-    { name: "Righto", url: "https://www.righto.com/feeds/posts/default" },
-    { name: "Lucumr", url: "https://lucumr.pocoo.org/feed.atom" },
-    { name: "Skyfall", url: "https://skyfall.dev/rss.xml" },
-    { name: "Gary Marcus", url: "https://garymarcus.substack.com/feed" },
-    { name: "Rachel By The Bay", url: "https://rachelbythebay.com/w/atom.xml" },
     { name: "Overreacted", url: "https://overreacted.io/rss.xml" },
-    { name: "Timsh", url: "https://timsh.org/rss/" },
-    { name: "John D Cook", url: "https://www.johndcook.com/blog/feed/" },
-    { name: "Giles Thomas", url: "https://gilesthomas.com/feed/rss.xml" },
-    { name: "Matklad", url: "https://matklad.github.io/feed.xml" },
-    { name: "Evan Hahn", url: "https://evanhahn.com/feed.xml" },
-    { name: "Terrible Software", url: "https://terriblesoftware.org/feed/" },
-    { name: "Rakhim", url: "https://rakhim.exotext.com/rss.xml" },
-    { name: "Joana Westenberg", url: "https://joanwestenberg.com/rss" },
-    { name: "Xania", url: "https://xania.org/feed" },
-    { name: "Micah Lee", url: "https://micahflee.com/feed/" },
-    { name: "Nesbitt", url: "https://nesbitt.io/feed.xml" },
-    { name: "Construction Physics", url: "https://www.construction-physics.com/feed" },
-    { name: "Tedium", url: "https://feed.tedium.co/" },
-    { name: "Susam", url: "https://susam.net/feed.xml" },
-    { name: "Entropic Thoughts", url: "https://entropicthoughts.com/feed.xml" },
-    { name: "Buttondown/Hillel", url: "https://buttondown.com/hillelwayne/rss" },
-    { name: "Dwarkesh", url: "https://www.dwarkeshpatel.com/feed" },
-    { name: "Borretti", url: "https://borretti.me/feed.xml" },
-    { name: "Minimaxir", url: "https://minimaxir.com/index.xml" },
-    { name: "Geohot", url: "https://geohot.github.io/blog/feed.xml" },
     { name: "Paul Graham Essays", url: "http://www.aaronsw.com/2002/feeds/pgessays.rss" },
-    { name: "Filfre", url: "https://www.filfre.net/feed/" },
-    { name: "Jim Nielsen", url: "https://blog.jim-nielsen.com/feed.xml" },
-    { name: "Geoffrey Litt", url: "https://www.geoffreylitt.com/feed.xml" },
-    { name: "Brutecat", url: "https://brutecat.com/rss.xml" },
-    { name: "Eli Thegreenplace", url: "https://eli.thegreenplace.net/feeds/all.atom.xml" },
-    { name: "Fabien Sanglard", url: "https://fabiensanglard.net/rss.xml" },
     { name: "Gwern", url: "https://gwern.substack.com/feed" },
-    { name: "Berthub", url: "https://berthub.eu/articles/index.xml" },
-    { name: "Chad Nauseam", url: "https://chadnauseam.com/rss.xml" },
-    { name: "Simon(e)", url: "https://simone.org/feed/" },
-    { name: "Beej.us", url: "https://beej.us/blog/rss.xml" },
-    { name: "Hey.Paris", url: "https://hey.paris/index.xml" },
-    { name: "Refactoring English", url: "https://refactoringenglish.com/index.xml" },
+    { name: "Pluralistic", url: "https://pluralistic.net/feed/" },
+    { name: "Lcamtuf Substack", url: "https://lcamtuf.substack.com/feed" },
+    { name: "Gary Marcus", url: "https://garymarcus.substack.com/feed" },
+    { name: "Dwarkesh", url: "https://www.dwarkeshpatel.com/feed" },
+    { name: "Mitchellh", url: "https://mitchellh.com/feed.xml" },
+    { name: "Matklad", url: "https://matklad.github.io/feed.xml" },
+    { name: "Krebs on Security", url: "https://krebsonsecurity.com/feed/" },
+    { name: "Troy Hunt", url: "https://www.troyhunt.com/rss/" },
     { name: "Works On My Machine", url: "https://worksonmymachine.substack.com/feed" },
     { name: "Steve Blank", url: "https://steveblank.com/feed/" },
-    { name: "Bernstein Bear", url: "https://bernsteinbear.com/feed.xml" },
-    { name: "Troy Hunt", url: "https://www.troyhunt.com/rss/" },
-    { name: "Herman Bearblog", url: "https://herman.bearblog.dev/feed/" },
-    { name: "Grants Latton", url: "https://grantslatton.com/rss.xml" },
-    { name: "Experimental History", url: "https://www.experimental-history.com/feed" },
-    { name: "Anil Dash", url: "https://anildash.com/feed.xml" },
     { name: "Miguel Grinberg", url: "https://blog.miguelgrinberg.com/feed" },
-    { name: "Computer Rip", url: "https://computer.rip/rss.xml" },
-    { name: "Ted Unangst", url: "https://www.tedunangst.com/flak/rss" },
+    { name: "Geohot", url: "https://geohot.github.io/blog/feed.xml" },
+    { name: "Minimaxir", url: "https://minimaxir.com/index.xml" },
+    { name: "Bernstein Bear", url: "https://bernsteinbear.com/feed.xml" },
+    { name: "Experimental History", url: "https://www.experimental-history.com/feed" },
 ];
 
 // 默认关键词
@@ -89,6 +42,13 @@ const API_CONFIGS = {
         modelPlaceholder: 'deepseek-v3-2-251201',
         baseUrlPlaceholder: 'https://ark.cn-beijing.volces.com/api/v3'
     }
+};
+
+// 当前任务信息
+let currentTask = {
+    total: 0,
+    current: 0,
+    currentTitle: ''
 };
 
 // 页面加载完成后初始化
@@ -148,13 +108,13 @@ function getSettings() {
 // 保存设置到 localStorage
 function saveSettings() {
     const settings = getSettings();
-    localStorage.setItem('aiNewsSettings', JSON.stringify(settings));
+    localStorage.setItem('nonoiseSettings', JSON.stringify(settings));
     alert('设置已保存！');
 }
 
 // 从 localStorage 加载设置
 function loadSettings() {
-    const saved = localStorage.getItem('aiNewsSettings');
+    const saved = localStorage.getItem('nonoiseSettings');
     if (!saved) return;
 
     try {
@@ -181,9 +141,24 @@ function loadSettings() {
 }
 
 // 更新进度条
-function updateProgress(percent, text) {
+function updateProgress(percent, current, total, currentTitle) {
     document.getElementById('progressBar').style.width = percent + '%';
-    document.getElementById('loadingText').textContent = text;
+    document.getElementById('progressText').textContent = `${current} / ${total}`;
+
+    if (currentTitle) {
+        document.getElementById('currentItem').textContent = currentTitle;
+    }
+}
+
+// 更新加载状态
+function setLoadingState(title, desc, current, total, currentTitle) {
+    document.getElementById('loadingTitle').textContent = title;
+    document.getElementById('loadingText').textContent = desc;
+
+    if (total > 0) {
+        const percent = Math.round((current / total) * 100);
+        updateProgress(percent, current, total, currentTitle);
+    }
 }
 
 // 生成阅读简报
@@ -208,10 +183,14 @@ async function generateReport() {
     document.getElementById('results').style.display = 'none';
     document.getElementById('loading').style.display = 'block';
 
-    try {
-        updateProgress(10, '正在获取 RSS 资讯...');
+    // 初始化进度
+    currentTask = { total: 0, current: 0, currentTitle: '' };
+    setLoadingState('🚀 正在启动...', '准备连接服务器', 0, 0, '');
 
-        // 调用 Serverless Function 获取文章
+    try {
+        // 第一阶段：获取文章
+        setLoadingState('📥 正在抓取资讯', '正在从 RSS 源获取文章...', 0, 0, '连接服务器...');
+
         const response = await fetch('/api/generate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -236,14 +215,29 @@ async function generateReport() {
             throw new Error(result.error);
         }
 
-        updateProgress(90, '正在渲染页面...');
-        displayResults(result.articles);
+        // 第二阶段：AI 处理
+        const articles = result.articles || [];
+        setLoadingState('🤖 AI 正在生成摘要', `共 ${articles.length} 篇文章需要处理...`, 0, articles.length, '');
+
+        // 显示结果
+        displayResults(articles);
 
     } catch (error) {
         alert('生成失败: ' + error.message);
-        document.getElementById('settingsPanel').style.display = 'block';
-        document.getElementById('loading').style.display = 'none';
+        goHome();
     }
+}
+
+// 渲染 Markdown
+function renderMarkdown(text) {
+    if (typeof marked !== 'undefined') {
+        return marked.parse(text);
+    }
+    // 如果没有 marked 库，简单转换
+    return text
+        .replace(/## (.*)/g, '<h4>$1</h4>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\n/g, '<br>');
 }
 
 // 显示结果
@@ -252,7 +246,11 @@ function displayResults(articles) {
     document.getElementById('results').style.display = 'block';
 
     document.getElementById('resultCount').textContent = articles.length;
-    document.getElementById('resultDate').textContent = new Date().toLocaleDateString('zh-CN');
+    document.getElementById('resultDate').textContent = new Date().toLocaleDateString('zh-CN', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
 
     const container = document.getElementById('articles');
     container.innerHTML = '';
@@ -261,28 +259,56 @@ function displayResults(articles) {
         const div = document.createElement('div');
         div.className = 'article';
         div.innerHTML = `
-            <h3>${index + 1}. ${article.title}</h3>
+            <h3>${index + 1}. ${escapeHtml(article.title)}</h3>
             <div class="article-meta">
-                来源: ${article.source} ·
-                <a href="${article.url}" target="_blank">查看原文</a>
+                <span class="source">${escapeHtml(article.source)}</span>
+                <a href="${escapeHtml(article.url)}" target="_blank">查看原文 →</a>
             </div>
-            <div class="article-summary">
-                ${article.summary}
+            <div class="article-summary markdown-body">
+                ${renderMarkdown(article.summary)}
             </div>
         `;
         container.appendChild(div);
     });
 }
 
+// 转义 HTML
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// 返回首页
+function goHome() {
+    document.getElementById('settingsPanel').style.display = 'block';
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('loading').style.display = 'none';
+
+    // 重置进度条
+    document.getElementById('progressBar').style.width = '0%';
+    document.getElementById('progressText').textContent = '0 / 0';
+    document.getElementById('currentItem').textContent = '';
+}
+
 // 复制到剪贴板
 function copyToClipboard() {
     const articles = document.querySelectorAll('.article');
-    let text = '# 今日 AI 阅读简报\n\n';
+    let text = '# 今日阅读简报\n\n';
+    text += `日期: ${new Date().toLocaleDateString('zh-CN')}\n\n`;
+    text += '---\n\n';
 
     articles.forEach((article, index) => {
         const title = article.querySelector('h3').textContent;
-        const summary = article.querySelector('.article-summary').textContent;
-        text += `## ${title}\n\n${summary}\n\n---\n\n`;
+        const summary = article.querySelector('.article-summary').innerText;
+        const source = article.querySelector('.source').textContent;
+        const url = article.querySelector('a').href;
+
+        text += `## ${title}\n\n`;
+        text += `来源: ${source}\n`;
+        text += `链接: ${url}\n\n`;
+        text += `${summary}\n\n`;
+        text += '---\n\n';
     });
 
     navigator.clipboard.writeText(text).then(() => {

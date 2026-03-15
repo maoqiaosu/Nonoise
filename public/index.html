@@ -5,18 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nonoise - 个性化阅读简报</title>
     <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.2.0/github-markdown.min.css">
 </head>
 <body>
     <div class="container">
         <!-- Header -->
         <header class="header">
-            <h1>🔇 Nonoise</h1>
+            <div class="logo">🔇</div>
+            <h1>Nonoise</h1>
             <p class="subtitle">从优质技术博客生成个性化中文阅读简报，告别信息噪音</p>
         </header>
 
         <!-- 设置面板 -->
         <section class="settings-panel" id="settingsPanel">
-            <h2>⚙️ 个性化设置</h2>
+            <div class="panel-header">
+                <h2>⚙️ 个性化设置</h2>
+            </div>
 
             <!-- API 配置 -->
             <div class="form-group">
@@ -70,7 +74,7 @@
             </div>
 
             <div class="button-group">
-                <button class="btn btn-primary" onclick="generateReport()">
+                <button class="btn btn-primary btn-large" onclick="generateReport()">
                     🚀 一键生成阅读简报
                 </button>
                 <button class="btn btn-secondary" onclick="saveSettings()">
@@ -81,17 +85,27 @@
 
         <!-- 加载状态 -->
         <div class="loading" id="loading" style="display: none;">
-            <div class="spinner"></div>
-            <p id="loadingText">正在抓取资讯...</p>
-            <div class="progress-bar">
-                <div class="progress" id="progressBar"></div>
+            <div class="loading-content">
+                <div class="spinner"></div>
+                <h3 id="loadingTitle">正在抓取资讯...</h3>
+                <p id="loadingText" class="loading-desc">准备中</p>
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress" id="progressBar"></div>
+                    </div>
+                    <span class="progress-text" id="progressText">0 / 0</span>
+                </div>
+                <div class="current-item" id="currentItem"></div>
             </div>
         </div>
 
         <!-- 结果展示 -->
         <section class="results" id="results" style="display: none;">
             <div class="results-header">
-                <h2>📰 今日阅读简报</h2>
+                <div class="header-left">
+                    <button class="btn btn-back" onclick="goHome()">← 返回</button>
+                    <h2>📰 今日阅读简报</h2>
+                </div>
                 <button class="btn btn-small" onclick="copyToClipboard()">📋 复制全部</button>
             </div>
             <div class="results-meta">
@@ -103,9 +117,10 @@
 
     <!-- 页脚 -->
     <footer class="footer">
-        <p>© 2026 AI 资讯助手 | 数据全部在本地处理，保护你的隐私</p>
+        <p>🔒 数据全部在本地处理，保护你的隐私</p>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="/app.js"></script>
 </body>
 </html>

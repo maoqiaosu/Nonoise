@@ -1,3 +1,4 @@
+// RSS 源列表
 const RSS_SOURCES = [
     { name: "Simon Willison", url: "https://simonwillison.net/atom/everything/" },
     { name: "Daring Fireball", url: "https://daringfireball.net/feeds/main" },
@@ -21,18 +22,54 @@ const RSS_SOURCES = [
     { name: "Experimental History", url: "https://www.experimental-history.com/feed" },
 ];
 
+// 根据模型名称自动判断 API 端点
+function getApiConfig(model, apiKey) {
+    const modelLower = model.toLowerCase();
+
+    // MiniMax 模型
+    if (modelLower.includes('minimax')) {
+        return {
+            url: 'https://api.minimax.chat/v1/text/chatcompletion_v2',
+            headers: {
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json'
+            }
+        };
+    }
+
+    // Anthropic 模型
+    if (modelLower.includes('claude')) {
+        return {
+            url: 'https://api.anthropic.com/v1/messages',
+            headers: {
+                'x-api-key': apiKey,
+                'anthropic-version': '2023-06-01',
+                'Content-Type': 'application/json'
+            },
+            isAnthropic: true
+        };
+    }
+
+    // 其他默认用 OpenAI 兼容格式
+    return {
+        url: 'https://api.openai.com/v1/chat/completions',
+        headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
+        }
+    };
+}
+
 // 解析日期
 function parseDate(dateStr) {
     if (!dateStr) return null;
     dateStr = dateStr.trim();
 
-    // 尝试 ISO 格式
     const isoMatch = dateStr.match(/(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2})/);
     if (isoMatch) {
         return new Date(isoMatch[1] + 'T' + isoMatch[2]);
     }
 
-    // 尝试 RFC 822 格式
     const date = new Date(dateStr);
     return isNaN(date.getTime()) ? null : date;
 }
@@ -51,7 +88,7 @@ function keywordMatch(title, summary, keywords) {
     return keywords.some(kw => text.includes(kw.toLowerCase()));
 }
 
-// 提取文本内容（处理 CDATA）
+// 提取文本内容
 function extractContent(html, tag) {
     const cdataMatch = html.match(new RegExp(`<${tag}[^>]*><!\\[CDATA\\[([\\s\\S]*?)\\]\\]><\\/${tag}>`, 'i'));
     if (cdataMatch) return cdataMatch[1].trim();
@@ -63,7 +100,7 @@ function extractContent(html, tag) {
 }
 
 // 获取 RSS 文章
-async function fetchRSS(source, keywords, daysBack, signal) {
+async function fetchRSS(source, keywords, daysBack) {
     try {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 8000);
@@ -75,20 +112,16 @@ async function fetchRSS(source, keywords, daysBack, signal) {
         clearTimeout(timeout);
 
         const text = await response.text();
-
-        // 检查是否是 Atom 或 RSS
         const isAtom = text.includes('<atom:') || text.includes('<feed ');
         const isRss = text.includes('<rss') || text.includes('<item>');
 
         const entries = [];
 
         if (isAtom) {
-            // Atom 格式解析
             const entryRegex = /<entry[^>]*>([\s\S]*?)<\/entry>/gi;
             let match;
             while ((match = entryRegex.exec(text)) !== null) {
                 const entry = match[1];
-
                 const title = extractContent(entry, 'title');
                 const linkMatch = entry.match(/<link[^>]*href=["']([^"']+)["'][^>]*>/i);
                 const link = linkMatch ? linkMatch[1] : '';
@@ -111,12 +144,10 @@ async function fetchRSS(source, keywords, daysBack, signal) {
                 }
             }
         } else if (isRss) {
-            // RSS 格式解析
             const itemRegex = /<item[^>]*>([\s\S]*?)<\/item>/gi;
             let match;
             while ((match = itemRegex.exec(text)) !== null) {
                 const item = match[1];
-
                 const title = extractContent(item, 'title');
                 const linkMatch = item.match(/<link[^>]*>([^<]+)<\/link>/i);
                 const link = linkMatch ? linkMatch[1].trim() : '';
@@ -142,7 +173,6 @@ async function fetchRSS(source, keywords, daysBack, signal) {
 
         return entries;
     } catch (error) {
-        // 静默处理错误
         return [];
     }
 }
@@ -162,55 +192,18 @@ async function generateSummary(article, config) {
 
 请用中文回复，格式清晰。`;
 
-    let url, headers, data;
-
-    const baseUrl = config.apiBaseUrl.replace(/\/$/, '');
-
-    if (config.apiProvider === 'minimax') {
-        url = `${baseUrl}/v1/text/chatcompletion_v2`;
-        headers = {
-            'Authorization': `Bearer ${config.apiKey}`,
-            'Content-Type': 'application/json'
-        };
+    let data;
+    if (config.isAnthropic) {
         data = {
-            model: config.apiModel,
-            messages: [{ role: 'user', content: prompt }],
-            max_tokens: 600
-        };
-    } else if (config.apiProvider === 'openai') {
-        url = `${baseUrl}/chat/completions`;
-        headers = {
-            'Authorization': `Bearer ${config.apiKey}`,
-            'Content-Type': 'application/json'
-        };
-        data = {
-            model: config.apiModel,
-            messages: [{ role: 'user', content: prompt }],
-            max_tokens: 600
-        };
-    } else if (config.apiProvider === 'volcengine' || config.apiProvider === 'custom') {
-        url = `${baseUrl}/chat/completions`;
-        headers = {
-            'Authorization': `Bearer ${config.apiKey}`,
-            'Content-Type': 'application/json'
-        };
-        data = {
-            model: config.apiModel,
-            messages: [{ role: 'user', content: prompt }],
-            max_tokens: 600
-        };
-    } else if (config.apiProvider === 'anthropic') {
-        // Anthropic API
-        url = `${baseUrl}/messages`;
-        headers = {
-            'x-api-key': config.apiKey,
-            'anthropic-version': '2023-06-01',
-            'Content-Type': 'application/json'
-        };
-        data = {
-            model: config.apiModel,
+            model: config.model,
             max_tokens: 600,
             messages: [{ role: 'user', content: prompt }]
+        };
+    } else {
+        data = {
+            model: config.model,
+            messages: [{ role: 'user', content: prompt }],
+            max_tokens: 600
         };
     }
 
@@ -218,9 +211,9 @@ async function generateSummary(article, config) {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 25000);
 
-        const response = await fetch(url, {
+        const response = await fetch(config.url, {
             method: 'POST',
-            headers,
+            headers: config.headers,
             body: JSON.stringify(data),
             signal: controller.signal
         });
@@ -264,7 +257,6 @@ function deduplicate(articles) {
 }
 
 export default async function handler(req, res) {
-    // 设置 CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -279,35 +271,37 @@ export default async function handler(req, res) {
 
     try {
         const {
-            keywords,
-            daysBack = 7,
-            maxArticles = 10,
-            apiProvider,
-            apiKey,
             apiModel,
-            apiBaseUrl
+            apiKey,
+            keywords,
+            daysBack = 3,
+            maxArticles = 10
         } = req.body;
 
         if (!apiKey) {
             return res.status(400).json({ error: '请提供 API Key' });
         }
 
+        if (!apiModel) {
+            return res.status(400).json({ error: '请提供模型名称' });
+        }
+
         if (!keywords || keywords.length === 0) {
             return res.status(400).json({ error: '请至少选择一个关键词' });
         }
 
-        // 配置
-        const config = { apiProvider, apiKey, apiModel, apiBaseUrl };
+        // 获取 API 配置
+        const apiConfig = getApiConfig(apiModel, apiKey);
+        apiConfig.model = apiModel;
 
-        // 获取所有文章（限制数量以避免超时）
+        // 获取所有文章
         let allArticles = [];
-        const sourcesToFetch = RSS_SOURCES.slice(0, 20); // 限制来源数量
+        const sourcesToFetch = RSS_SOURCES.slice(0, 20);
 
-        // 并发抓取，但限制并发数
         const batchSize = 5;
         for (let i = 0; i < sourcesToFetch.length; i += batchSize) {
             const batch = sourcesToFetch.slice(i, i + batchSize);
-            const promises = batch.map(source => fetchRSS(source, keywords, daysBack, null));
+            const promises = batch.map(source => fetchRSS(source, keywords, daysBack));
             const results = await Promise.all(promises);
             results.forEach(articles => allArticles.push(...articles));
         }
@@ -315,12 +309,11 @@ export default async function handler(req, res) {
         // 去重
         allArticles = deduplicate(allArticles);
 
-        // 如果没有足够的文章，减少请求
+        // 如果没有足够的文章，再抓取更多来源
         const needMore = maxArticles - allArticles.length;
         if (needMore > 0 && allArticles.length > 0) {
-            // 再抓取更多来源
             const moreSources = RSS_SOURCES.slice(20, 40);
-            const promises = moreSources.map(source => fetchRSS(source, keywords, daysBack, null));
+            const promises = moreSources.map(source => fetchRSS(source, keywords, daysBack));
             const results = await Promise.all(promises);
             results.forEach(articles => allArticles.push(...articles));
             allArticles = deduplicate(allArticles);
@@ -329,10 +322,10 @@ export default async function handler(req, res) {
         // 限制数量
         const selectedArticles = allArticles.slice(0, maxArticles);
 
-        // 生成摘要（串行以避免 API 限流）
+        // 生成摘要
         const finalArticles = [];
         for (const article of selectedArticles) {
-            const summary = await generateSummary(article, config);
+            const summary = await generateSummary(article, apiConfig);
             finalArticles.push({
                 title: article.title,
                 url: article.url,

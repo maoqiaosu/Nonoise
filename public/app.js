@@ -22,51 +22,11 @@ const RSS_SOURCES = [
     { name: "Experimental History", url: "https://www.experimental-history.com/feed" },
 ];
 
-// API 配置模板
-const API_CONFIGS = {
-    minimax: {
-        name: 'MiniMax',
-        model: 'MiniMax-M2.5',
-        baseUrl: 'https://api.minimax.chat'
-    },
-    openai: {
-        name: 'OpenAI',
-        model: 'gpt-4o-mini',
-        baseUrl: 'https://api.openai.com/v1'
-    },
-    anthropic: {
-        name: 'Anthropic',
-        model: 'claude-sonnet-4-20250514',
-        baseUrl: 'https://api.anthropic.com/v1'
-    },
-    volcengine: {
-        name: '火山引擎',
-        model: 'deepseek-v3-2-251201',
-        baseUrl: 'https://ark.cn-beijing.volces.com/api/v3'
-    },
-    custom: {
-        name: '自定义',
-        model: '',
-        baseUrl: 'https://api.openai.com/v1'
-    }
-};
-
 // 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', () => {
     loadSettings();
     setupKeywordTags();
-    setupApiProvider();
 });
-
-// 切换 API 提供商时更新
-function setupApiProvider() {
-    const provider = document.getElementById('apiProvider');
-    provider.addEventListener('change', () => {
-        const config = API_CONFIGS[provider.value];
-        document.getElementById('apiModel').placeholder = config.model;
-        document.getElementById('apiModel').value = '';
-    });
-}
 
 // 关键词标签点击事件
 function setupKeywordTags() {
@@ -93,14 +53,9 @@ function getSelectedKeywords() {
 
 // 获取用户配置
 function getSettings() {
-    const provider = document.getElementById('apiProvider').value;
-    const config = API_CONFIGS[provider];
-
     return {
-        apiProvider: provider,
+        apiModel: document.getElementById('apiModel').value.trim(),
         apiKey: document.getElementById('apiKey').value.trim(),
-        apiModel: document.getElementById('apiModel').value.trim() || config.model,
-        apiBaseUrl: config.baseUrl,
         keywords: getSelectedKeywords(),
         daysBack: parseInt(document.getElementById('daysBack').value) || 3,
         maxArticles: Math.min(parseInt(document.getElementById('maxArticles').value) || 10, 10)
@@ -122,9 +77,8 @@ function loadSettings() {
     try {
         const settings = JSON.parse(saved);
 
-        document.getElementById('apiProvider').value = settings.apiProvider || 'minimax';
-        document.getElementById('apiKey').value = settings.apiKey || '';
         document.getElementById('apiModel').value = settings.apiModel || '';
+        document.getElementById('apiKey').value = settings.apiKey || '';
         document.getElementById('customKeywords').value = settings.customKeywords || '';
         document.getElementById('daysBack').value = settings.daysBack || 3;
         document.getElementById('maxArticles').value = settings.maxArticles || 10;
@@ -195,6 +149,11 @@ async function generateReport() {
 
     if (!settings.apiKey) {
         alert('请输入 API Key！');
+        return;
+    }
+
+    if (!settings.apiModel) {
+        alert('请输入模型名称！');
         return;
     }
 

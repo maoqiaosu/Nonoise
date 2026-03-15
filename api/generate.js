@@ -229,19 +229,64 @@ async function generateSummary(article, config) {
         if (result.content && result.content[0]) {
             return result.content[0].text;
         }
-        // 错误处理
+
+        // 错误处理 - 区分错误类型
+        const errorStr = JSON.stringify(result).toLowerCase();
+
+        // API Key 错误
+        if (errorStr.includes('invalid api key') ||
+            errorStr.includes('incorrect api key') ||
+            errorStr.includes('unauthorized') ||
+            errorStr.includes('authentication') ||
+            errorStr.includes('401') ||
+            errorStr.includes('api key')) {
+            return `❌ API Key 错误：请检查你的 API Key 是否正确`;
+        }
+
+        // 模型不存在
+        if (errorStr.includes('invalid model') ||
+            errorStr.includes('model not found') ||
+            errorStr.includes('model does not exist') ||
+            errorStr.includes('404') ||
+            errorStr.includes('unknown model')) {
+            return `❌ 模型名称错误：请检查模型名称是否正确，如 "MiniMax-M2.5"、"gpt-4o"`;
+        }
+
+        // 余额不足
+        if (errorStr.includes('insufficient balance') ||
+            errorStr.includes('quota') ||
+            errorStr.includes('billing') ||
+            errorStr.includes('credit')) {
+            return `❌ 余额不足：请检查你的 API 账户余额`;
+        }
+
+        // 速率限制
+        if (errorStr.includes('rate limit') ||
+            errorStr.includes('429') ||
+            errorStr.includes('too many requests')) {
+            return `❌ 请求过于频繁：请稍后重试`;
+        }
+
+        // 其他错误
         if (result.base_resp) {
-            return `API 错误: ${result.base_resp.status_msg}`;
+            return `❌ API 错误: ${result.base_resp.status_msg}`;
         }
         if (result.error) {
-            return `API 错误: ${result.error.message || JSON.stringify(result)}`;
+            return `❌ API 错误: ${result.error.message || JSON.stringify(result).substring(0, 100)}`;
         }
         if (result.type === 'error') {
-            return `API 错误: ${result.error?.message || JSON.stringify(result)}`;
+            return `❌ API 错误: ${result.error?.message || JSON.stringify(result).substring(0, 100)}`;
         }
-        return `API 返回异常: ${JSON.stringify(result).substring(0, 100)}`;
+        return `❌ API 返回异常: ${JSON.stringify(result).substring(0, 100)}`;
     } catch (error) {
-        return `调用失败: ${error.message}`;
+        // 网络错误
+        if (error.name === 'AbortError') {
+            return '⏹️ 请求已取消';
+        }
+        if (error.message.includes('network') || error.message.includes('fetch')) {
+            return `❌ 网络错误：请检查网络连接`;
+        }
+        return `❌ 调用失败: ${error.message}`;
     }
 }
 
